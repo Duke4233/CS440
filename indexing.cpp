@@ -1,17 +1,22 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <tuple>
+#include <tuple> 
 using namespace std;
 
-
+// maybe use this? It could work so we have a bucket
 structure Bucket {
 tuple <int,void *> [];
-
+// if we use this we will want ot have a read and a write bucket funcations.
+// read will store information in hte current information.
+// write will write the current buckets information
 }
 
 
 void read(){
+// this reads all the contents of the file
+// probally can be called within our readBlock and just assign contents to a block.
+// not sure on that tho
 
     ifstream fin;
     string line;
@@ -58,12 +63,12 @@ int main()
     float capacity = 0.8;
 
     // increment N if avg number of records per block is greater than 0.8 %
-    read();
+    read(); // this was just just funcation,
     // read the line take
     // bucket array <hkey,bucketid stored on disk, index structure can be read from disk to main memory
-    // index file
+    // index file we want to save our buckets into a file so when we call program with L option we have the bucket arrays.
 
-    // hash file
+    // hash file EmployeeIndex- must be named that
 
     //
 

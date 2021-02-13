@@ -23,11 +23,28 @@ void read(){
 }]
 
 struct block {
-    int numRecords;
+    int numRecords; // counter to keep track of the number of records in the records array.
     int totalSize;
+
+
+    string records[25][4]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
+
     
+    int writeBlock(int filelocation);
+    void readBlock(int filelocation,struct::block *block_ptr);
+    int editBlock() // this will call readBlock;
+    void printBlock(int filelocation,int id); // this will call readBlock 
+
+
+
 
 }
+
+
+    struct::block int writeBlock(int filelocation);
+    void readBlock(int filelocation,struct::block *block_ptr);
+    int editBlock() // this will call readBlock;
+    void printBlock(int filelocation,int id); // this will call readBlock 
 // prototypes
 int hashFuncation( int x);
 

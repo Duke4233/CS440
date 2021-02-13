@@ -7,13 +7,32 @@
 using namespace std;
 
 // maybe use this? It could work so we have a bucket
-structure Bucket {
-tuple <int,void *> [];
+/*struct Bucket {
+tuple::tuple <int,void *> [];
 int
 // if we use this we will want ot have a read and a write bucket funcations.
 // read will store information in hte current information.
 // write will write the current buckets information
-}
+}*/
+
+struct record {
+  long long id;
+  string name;
+  string bio;
+  long long manager_id;
+};
+
+struct block {
+    int numRecords; // counter to keep track of the number of records in the records array.
+    int totalSize;
+    record records[25]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
+
+    
+    void readBlock(int filelocation,struct::block *block_ptr);
+    int editBlock(); // this will call readBlock;
+    void printBlock(int filelocation,int id); // this will call readBlock 
+
+};
 
 
 void write() {
@@ -33,6 +52,7 @@ void read() {
   string name;
   string bio;
   string manager_id;
+  block currentBlock;
   //vector<string> v[50];
 
   fin.open("Employees.csv");
@@ -54,24 +74,19 @@ void read() {
   fin.close();
 }
 
-struct block {
-    int numRecords; // counter to keep track of the number of records in the records array.
-    int totalSize;
 
+    int writeBlock(struct block myBlock, int filelocation)
+    {
+      ofstream fout;
+      fout.open("EmployeeIndex.csv");
+      //code here
+      fout.write((char*)block, sizeof(block))
+      fout.close();
 
-    string records[25][4]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
-
-    
-    int writeBlock(int filelocation);
-    void readBlock(int filelocation,struct::block *block_ptr);
-    int editBlock() // this will call readBlock;
-    void printBlock(int filelocation,int id); // this will call readBlock 
-
-}
-    int block::writeBlock(int filelocation);
-    void block::readBlock(int filelocation,struct::block *block_ptr);
-    int block::editBlock() // this will call readBlock;
-    void block::printBlock(int filelocation,int id); // this will call readBlock 
+    }
+    void block::readBlock(int filelocation,struct block *block_ptr){}
+    int block::editBlock(){} // this will call readBlock;
+    void block::printBlock(int filelocation,int id){} // this will call readBlock 
 // prototypes
 int hashFuncation( int x);
 
@@ -114,7 +129,7 @@ int main(int argc, char const *argv[]) {
   return 0;
 }
 
-/int hashFuncation(int x){
+/*int hashFuncation(int x){
     return(x%bucket);
 
 }*/

@@ -25,15 +25,65 @@ struct record {
 struct block {
     int numRecords; // counter to keep track of the number of records in the records array.
     int totalSize;
-    record records[60]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
-
-    
-    
+    record records[25]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
     int editBlock(); // this will call readBlock;
     void printBlock(int filelocation,int id); // this will call readBlock 
 
 };
+
+    
+// prototypes
+int hashFuncation( int x);
 struct block readBlock();
+int editBlock(){return 0;} // this will call readBlock;
+void printBlock(int filelocation,int id){} // this will call readBlock 
+void read();
+
+int main(int argc, char const *argv[]) {
+  string choice;
+  struct block currentBlock;
+
+  if (argc == 1) {
+    cout << "ERROR: Choice of mode needed on command line (C or L [ID])" << endl;
+    exit(1);
+  }
+
+  choice = argv[1];
+
+  if ( choice == "-C") {
+    cout << "choice C" << endl;
+  } else if(choice == "-L"){
+    cout << "choice L" << endl;
+  } else {
+    cout << endl << "**Error in the inputted string, please try again**" << endl << endl;
+  }
+
+  read();
+  currentBlock = readBlock();
+  cout << sizeof(currentBlock.records)/sizeof(record) << endl;
+  cout << currentBlock.records[0].name;
+
+
+  // c input creation of index
+    // L <id> Look up index
+    // block size = 4096
+    int blockSize = 4096;
+    float capacity = 0.8;
+
+    // increment N if avg number of records per block is greater than 0.8 %
+    // read the line take
+    // bucket array <hkey,bucketid stored on disk, index structure can be read from disk to main memory
+    // index file we want to save our buckets into a file so when we call program with L option we have the bucket arrays.
+
+    // hash file EmployeeIndex- must be named that
+
+    //
+
+  return 0;
+}
+
+
+
 
 void write() {
   ofstream fout;
@@ -101,74 +151,27 @@ void read() {
 
 
    
-    struct block readBlock(){
-      FILE *infile;
-      struct block currentBlock;
-      //struct block readBlock;
-      
-      
-      infile = fopen ("EmployeeIndex.txt", "r"); 
-      if (infile == NULL) 
-      { 
-        fprintf(stderr, "\nError opening file\n"); 
-        exit (1); 
-      } 
-      
-      // read file contents till end of file 
-      while(fread(&currentBlock, sizeof(struct block), 1, infile)) 
-        
-  
-    // close file 
-    fclose (infile); 
-    return currentBlock;
-
-    }
-    int block::editBlock(){return 0;} // this will call readBlock;
-    void block::printBlock(int filelocation,int id){} // this will call readBlock 
-// prototypes
-int hashFuncation( int x);
-
-int main(int argc, char const *argv[]) {
-  string choice;
+struct block readBlock(){
+  FILE *infile;
   struct block currentBlock;
+  //struct block readBlock;
+  
+  
+  infile = fopen ("EmployeeIndex.txt", "r"); 
+  if (infile == NULL) 
+  { 
+    fprintf(stderr, "\nError opening file\n"); 
+    exit (1); 
+  } 
+  
+  // read file contents till end of file 
+  while(fread(&currentBlock, sizeof(struct block), 1, infile)) 
+    
 
-  if (argc == 1) {
-    cout << "ERROR: Choice of mode needed on command line (C or L [ID])" << endl;
-    exit(1);
-  }
+// close file 
+fclose (infile); 
+return currentBlock;
 
-  choice = argv[1];
-
-  if ( choice == "-C") {
-    cout << "choice C" << endl;
-  } else if(choice == "-L"){
-    cout << "choice L" << endl;
-  } else {
-    cout << endl << "**Error in the inputted string, please try again**" << endl << endl;
-  }
-
-  read();
-  currentBlock = readBlock();
-  cout << sizeof(currentBlock.records)/sizeof(record) << endl;
-  cout << currentBlock.records[0].name;
-
-
-  // c input creation of index
-    // L <id> Look up index
-    // block size = 4096
-    int blockSize = 4096;
-    float capacity = 0.8;
-
-    // increment N if avg number of records per block is greater than 0.8 %
-    // read the line take
-    // bucket array <hkey,bucketid stored on disk, index structure can be read from disk to main memory
-    // index file we want to save our buckets into a file so when we call program with L option we have the bucket arrays.
-
-    // hash file EmployeeIndex- must be named that
-
-    //
-
-  return 0;
 }
 
 /*int hashFuncation(int x){

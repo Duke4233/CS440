@@ -15,6 +15,7 @@ int
 // write will write the current buckets information
 }*/
 
+
 struct record {
   long long id;
   string name;
@@ -30,6 +31,7 @@ struct block {
     void printBlock(int filelocation,int id); // this will call readBlock 
 
 };
+
 // maybe use this IDK
 struct index {
   int hash;
@@ -38,14 +40,27 @@ struct index {
   int index; // 0-4
 
 };
+struct Hmap {
+//Variables
+    int n; // buckets in use
+    int i; // ceil(log2(n))
+    int block_size;
+    vector<block> blocks; // bucket array
+};
 
     
 // prototypes
 int hashFuncation( int x);
 struct block readBlock(struct block myBlock, int fileLocation);
+int writeBlock(struct Block myBlock, int filelocation);
 int editBlock(){return 0;} // this will call readBlock;
 void printBlock(int filelocation,int id){} // this will call readBlock 
 void read();// TODO ad
+void write(); // maybe remove
+void averageOccupance(int numRecords, int numBuckets);
+int hash(int x);
+void insert(int key);
+void search(int key);
 
 int main(int argc, char const *argv[]) {
   string choice;
@@ -92,40 +107,42 @@ int main(int argc, char const *argv[]) {
 }
 
 
-
-
-void write() { // maybe remove
+/* void write() {
   ofstream fout;
 
   fout.open("EmployeeIndex.txt");
   //code here
 
   fout.close();
-}
+} */
+
 // returns the location in the file that we should write to next time.
- int writeBlock(struct block myBlock, int filelocation)
-    {
-      //FILE * outfile;
-      ofstream fout;
-      //outfile = fopen("EmployeeIndex.txt","w");
-      fout.open("EmployeeIndex.txt");
-     // cout << "put pointr location" << fout.tellp() << "\n"; // REMOVE
-      //code here
-     // fwrite(&myBlock, sizeof(struct block),1,outfile);
-     fout.seekp(filelocation); // seeks to file location and will start the write after that.
-     fout.write((char*) &myBlock,sizeof(struct block));
-     //cout << "get pointr location" << fout.tellp() << "\n"; // REMOVE
+//======================================
+int writeBlock(struct block myBlock, int filelocation)
+  {
+    //FILE * outfile;
+    ofstream fout;
+    //outfile = fopen("EmployeeIndex.txt","w");
+    fout.open("EmployeeIndex.txt");
+    // cout << "put pointr location" << fout.tellp() << "\n"; // REMOVE
+    //code here
+    // fwrite(&myBlock, sizeof(struct block),1,outfile);
+    fout.seekp(filelocation); // seeks to file location and will start the write after that.
+    fout.write((char*) &myBlock,sizeof(struct block));
+    //cout << "get pointr location" << fout.tellp() << "\n"; // REMOVE
 
-      //fclose(outfile);
+    //fclose(outfile);
+    fout.close();
+    return fout.tellp(); // reutrns the current place in the file at the end of the block that was written.
+}
 
-      return fout.tellp(); // reutrns the current place in the file at the end of the block that was written.
-    }
-
+//======================================
 void read() {
   ifstream fin;
   string line;
   char delimiter = ',';
   int iterator = 0;
+
   string id;
   string name;
   string bio;
@@ -144,32 +161,24 @@ void read() {
   while (getline(fin, id, delimiter)) {
     
       getline(fin, name, delimiter); 
-     // cout <<"\nsize of name" <<name.length() << "\n"; // REMOVE
-     // cout <<"\n capacity" << bio.capacity() << "\n"; // REMOVE
       getline(fin, bio, delimiter); 
       getline(fin, manager_id, '\n');
 
-    currentRecord.id = stoll(id,size_ptr,0);
-    currentRecord.name = name;
-    currentRecord.bio = bio;
-    //cout << currentRecord.bio.capacity() << "\n"; // REMOVE
-    currentRecord.manager_id = stoll(manager_id,size_ptr,0);
-    currentBlock.records[i] = currentRecord;
-    currentBlock.totalSize += sizeof(currentRecord);
-    currentBlock.numRecords += 1;
-    if (currentBlock.numRecords >= 5){
+      currentRecord.id = stoll(id,size_ptr,0);
+      currentRecord.name = name;
+      currentRecord.bio = bio;
+      //cout << currentRecord.bio.capacity() << "\n"; // REMOVE
+      currentRecord.manager_id = stoll(manager_id,size_ptr,0);
+      currentBlock.records[i] = currentRecord;
+      currentBlock.totalSize += sizeof(currentRecord);
+      currentBlock.numRecords += 1;
       // write currentBlock and save the location
-      writeBlock(currentBlock,currentOffset); 
-      currentOffset = writeBlock(currentBlock,currentOffset); 
-      i = 0;
-    }
+      if (currentBlock.numRecords >= 5){
+        writeBlock(currentBlock,currentOffset); 
+        currentOffset = writeBlock(currentBlock,currentOffset); 
+        i = 0;
+      }
     i++;
-
-     //  cout << "ID: " << currentRecord.id << '\n';
-      // cout << "name: " << currentRecord.name << '\n';
-      // cout << "bio: " << currentRecord.bio << '\n';
-       //cout << "manager-id: " << currentRecord.manager_id << '\n';
-       //cout << endl << endl;
     }
   }
   fin.close();
@@ -177,34 +186,45 @@ void read() {
 }
 
 // Read block
+//========================================================================================
 struct block readBlock(struct block myBlock, int fileLocation){
-  //FILE *infile;
   ifstream fin;
   struct block currentBlock;
-  //struct block readBlock;
   
-
+  fin.open("EmployeeIndex.txt");
   fin.seekg(fileLocation);
   fin.read((char*) &myBlock,sizeof(struct block));
   //infile = fopen ("EmployeeIndex.txt", "r"); 
-  /* fin.open("EmployeeIndex.txt");
-  if (infile == NULL) 
+  if (fin.fail()) 
   { 
     fprintf(stderr, "\nError opening file\n"); 
     exit (1); 
-  }  */
-  
-  // read file contents till end of file 
-  /* while(fread(&currentBlock, sizeof(struct block), 1, infile)) 
-     */
+  }  
 
 // close file 
-/* fclose (infile);  */
+fin.close();
 return currentBlock;
 }
-
 /*int hashFuncation(int x){
     return(x%bucket);
 
 }*/
+//========================================================================================
+void averageOccupance(int numRecords, int numBuckets) {
+  double threshold = 0.80;
+  int maxBlockSize = 5; //max 5 records can be in each block (4096/(8+8+200+500) = ~5.72)
+  int n, n_worked;
+  
+  if (numRecords/(numBuckets*maxBlockSize) > threshold) {
+    n = numBuckets++;
+    j = ceil(log2((double)n));
+    n_worked = n ^(1 << x)
 
+    for (every search key k in bucket n_worked) {
+      if ( last j bits of k == n) {
+        move search key k into the new bucket n
+      }
+    }
+  }
+  increment n and i for hashmap;
+}

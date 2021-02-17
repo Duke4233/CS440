@@ -15,6 +15,25 @@ int
 // write will write the current buckets information
 }*/
 
+void averageOccupance(int numRecords, int numBuckets) {
+  double threshold = 0.80;
+  int maxBlockSize = 5; //max 5 records can be in each block (4096/(8+8+200+500) = ~5.72)
+  int n, n_worked;
+  if (numRecords/(numBuckets*maxBlockSize) > threshold) {
+    n = numBuckets++;
+    j = ceil(log2((double)n));
+    n_worked = n ^(1 << x)
+
+    for (every search key k in bucket n_worked) {
+      if ( last j bits of k == n) {
+        move search key k into the new bucket n
+      }
+    }
+  }
+  increment n and i for hashmap
+}
+
+
 struct Record {
   long long id;
   string name;
@@ -37,10 +56,16 @@ struct Block {
 };
 
 struct Hmap {
-    int n_index;
-    int num_bits;
-    vector<Block> v;
+//Variables
+    int n; // buckets in use
+    int i; // ceil(log2(n))
+    int block_size;
+    vector<Block> blocks; // bucket array
 };
+//function prototypes
+int hash(int x);
+void insert(int key);
+void search(int key);
 
 void write() {
   ofstream fout;

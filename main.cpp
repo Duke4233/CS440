@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <string.h>
 #include <tuple> 
 #include <stdlib.h>
 #include <vector>
@@ -25,23 +25,36 @@ struct record {
 struct block {
     int numRecords; // counter to keep track of the number of records in the records array.
     int totalSize;
-    record records[25]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
+    record records[60]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
 
     
-    void readBlock(int filelocation,struct::block *block_ptr);
+    
     int editBlock(); // this will call readBlock;
     void printBlock(int filelocation,int id); // this will call readBlock 
 
 };
-
+struct block readBlock();
 
 void write() {
   ofstream fout;
 
-  fout.open("EmployeeIndex.csv");
+  fout.open("EmployeeIndex.txt");
   //code here
+
+
   fout.close();
 }
+
+ int writeBlock(struct block myBlock, int filelocation)
+    {
+      FILE * outfile;
+      //ofstream fout;
+      outfile = fopen("EmployeeIndex.txt","w");
+      //code here
+      fwrite(&myBlock, sizeof(struct block),1,outfile);
+      fclose(outfile);
+      return 0;
+    }
 
 void read() {
   ifstream fin;
@@ -53,45 +66,71 @@ void read() {
   string bio;
   string manager_id;
   block currentBlock;
+  record currentRecord;
+  size_t *size_ptr = NULL;
+  int i = 0;
   //vector<string> v[50];
 
-  fin.open("Employees.csv");
+  fin.open("Employee.csv");
   if (fin.fail()) {
     cout << "Could not open the file";
   } else {
   while (getline(fin, id, delimiter)) {
+    
       getline(fin, name, delimiter);
       getline(fin, bio, delimiter);
       getline(fin, manager_id, '\n');
 
-      // cout << "ID: " << id << '\n';
-      // cout << "name: " << name << '\n';
-      // cout << "bio: " << bio << '\n';
-      // cout << "manager-id: " << manager_id << '\n';
-      // cout << endl << endl;
+    currentRecord.id = stoll(id,size_ptr,0);
+    currentRecord.name = name;
+    currentRecord.bio = bio;
+    currentRecord.manager_id = stoll(manager_id,size_ptr,0);
+    currentBlock.records[i] = currentRecord;
+    i++;
+
+     //  cout << "ID: " << currentRecord.id << '\n';
+      // cout << "name: " << currentRecord.name << '\n';
+      // cout << "bio: " << currentRecord.bio << '\n';
+       //cout << "manager-id: " << currentRecord.manager_id << '\n';
+       //cout << endl << endl;
     }
   }
   fin.close();
+  writeBlock(currentBlock,0);
 }
 
 
-    int writeBlock(struct block myBlock, int filelocation)
-    {
-      ofstream fout;
-      fout.open("EmployeeIndex.csv");
-      //code here
-      fout.write((char*)block, sizeof(block))
-      fout.close();
+   
+    struct block readBlock(){
+      FILE *infile;
+      struct block currentBlock;
+      //struct block readBlock;
+      
+      
+      infile = fopen ("EmployeeIndex.txt", "r"); 
+      if (infile == NULL) 
+      { 
+        fprintf(stderr, "\nError opening file\n"); 
+        exit (1); 
+      } 
+      
+      // read file contents till end of file 
+      while(fread(&currentBlock, sizeof(struct block), 1, infile)) 
+        
+  
+    // close file 
+    fclose (infile); 
+    return currentBlock;
 
     }
-    void block::readBlock(int filelocation,struct block *block_ptr){}
-    int block::editBlock(){} // this will call readBlock;
+    int block::editBlock(){return 0;} // this will call readBlock;
     void block::printBlock(int filelocation,int id){} // this will call readBlock 
 // prototypes
 int hashFuncation( int x);
 
 int main(int argc, char const *argv[]) {
   string choice;
+  struct block currentBlock;
 
   if (argc == 1) {
     cout << "ERROR: Choice of mode needed on command line (C or L [ID])" << endl;
@@ -108,7 +147,10 @@ int main(int argc, char const *argv[]) {
     cout << endl << "**Error in the inputted string, please try again**" << endl << endl;
   }
 
-  //read();
+  read();
+  currentBlock = readBlock();
+  cout << sizeof(currentBlock.records)/sizeof(record) << endl;
+  cout << currentBlock.records[0].name;
 
 
   // c input creation of index

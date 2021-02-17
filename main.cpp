@@ -25,7 +25,7 @@ struct record {
 struct block {
     int numRecords; // counter to keep track of the number of records in the records array.
     int totalSize;
-    record records[25]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
+    record records[60]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
     int editBlock(); // this will call readBlock;
     void printBlock(int filelocation,int id); // this will call readBlock 
 
@@ -52,13 +52,13 @@ int main(int argc, char const *argv[]) {
 
   if ( choice == "-C") {
     cout << "choice C" << endl;
+    read();
   } else if(choice == "-L"){
     cout << "choice L" << endl;
   } else {
     cout << endl << "**Error in the inputted string, please try again**" << endl << endl;
   }
 
-  read();
   currentBlock = readBlock();
   cout << sizeof(currentBlock.records)/sizeof(record) << endl;
   cout << currentBlock.records[0].name;
@@ -97,12 +97,18 @@ void write() {
 
  int writeBlock(struct block myBlock, int filelocation)
     {
-      FILE * outfile;
-      //ofstream fout;
-      outfile = fopen("EmployeeIndex.txt","w");
+      //FILE * outfile;
+      ofstream fout;
+      //outfile = fopen("EmployeeIndex.txt","w");
+      fout.open("EmployeeIndex.txt");
+      cout << "put pointr location" << fout.tellp() << "\n";
       //code here
-      fwrite(&myBlock, sizeof(struct block),1,outfile);
-      fclose(outfile);
+     // fwrite(&myBlock, sizeof(struct block),1,outfile);
+     fout.write((char*) &myBlock,sizeof(struct block));
+     cout << "get pointr location" << fout.tellp() << "\n";
+
+      //fclose(outfile);
+
       return 0;
     }
 
@@ -149,8 +155,7 @@ void read() {
   writeBlock(currentBlock,0);
 }
 
-
-   
+// Read block
 struct block readBlock(){
   FILE *infile;
   struct block currentBlock;
@@ -171,7 +176,6 @@ struct block readBlock(){
 // close file 
 fclose (infile); 
 return currentBlock;
-
 }
 
 /*int hashFuncation(int x){

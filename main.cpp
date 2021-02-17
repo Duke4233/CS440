@@ -25,23 +25,32 @@ struct record {
 struct block {
     int numRecords; // counter to keep track of the number of records in the records array.
     int totalSize;
-    record records[60]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
+    record records[5]; // I chose 25 as the max nubmer of records because seemed liek a good nubmer it was okayed by professor
     int editBlock(); // this will call readBlock;
     void printBlock(int filelocation,int id); // this will call readBlock 
+
+};
+// maybe use this IDK
+struct index {
+  int hash;
+  int id;
+  int location;
+  int index; // 0-4
 
 };
 
     
 // prototypes
 int hashFuncation( int x);
-struct block readBlock();
+struct block readBlock(struct block myBlock, int fileLocation);
 int editBlock(){return 0;} // this will call readBlock;
 void printBlock(int filelocation,int id){} // this will call readBlock 
-void read();
+void read();// TODO ad
 
 int main(int argc, char const *argv[]) {
   string choice;
   struct block currentBlock;
+  int offset = 0;
 
   if (argc == 1) {
     cout << "ERROR: Choice of mode needed on command line (C or L [ID])" << endl;
@@ -52,16 +61,16 @@ int main(int argc, char const *argv[]) {
 
   if ( choice == "-C") {
     cout << "choice C" << endl;
-    read();
+    read(); // r
   } else if(choice == "-L"){
     cout << "choice L" << endl;
   } else {
     cout << endl << "**Error in the inputted string, please try again**" << endl << endl;
   }
 
-  currentBlock = readBlock();
-  cout << sizeof(currentBlock.records)/sizeof(record) << endl;
-  cout << currentBlock.records[0].name;
+  currentBlock = readBlock(currentBlock,offset);
+  //cout << sizeof(currentBlock.records)/sizeof(record) << endl; // REMOVE
+  //cout << currentBlock.records[0].name; // REMOVE
 
 
   // c input creation of index
@@ -85,31 +94,31 @@ int main(int argc, char const *argv[]) {
 
 
 
-void write() {
+void write() { // maybe remove
   ofstream fout;
 
   fout.open("EmployeeIndex.txt");
   //code here
 
-
   fout.close();
 }
-
+// returns the location in the file that we should write to next time.
  int writeBlock(struct block myBlock, int filelocation)
     {
       //FILE * outfile;
       ofstream fout;
       //outfile = fopen("EmployeeIndex.txt","w");
       fout.open("EmployeeIndex.txt");
-      cout << "put pointr location" << fout.tellp() << "\n";
+     // cout << "put pointr location" << fout.tellp() << "\n"; // REMOVE
       //code here
      // fwrite(&myBlock, sizeof(struct block),1,outfile);
+     fout.seekp(filelocation); // seeks to file location and will start the write after that.
      fout.write((char*) &myBlock,sizeof(struct block));
-     cout << "get pointr location" << fout.tellp() << "\n";
+     //cout << "get pointr location" << fout.tellp() << "\n"; // REMOVE
 
       //fclose(outfile);
 
-      return 0;
+      return fout.tellp(); // reutrns the current place in the file at the end of the block that was written.
     }
 
 void read() {
@@ -125,6 +134,7 @@ void read() {
   record currentRecord;
   size_t *size_ptr = NULL;
   int i = 0;
+  int currentOffset = 0;
   //vector<string> v[50];
 
   fin.open("Employee.csv");
@@ -133,15 +143,26 @@ void read() {
   } else {
   while (getline(fin, id, delimiter)) {
     
-      getline(fin, name, delimiter);
-      getline(fin, bio, delimiter);
+      getline(fin, name, delimiter); 
+     // cout <<"\nsize of name" <<name.length() << "\n"; // REMOVE
+     // cout <<"\n capacity" << bio.capacity() << "\n"; // REMOVE
+      getline(fin, bio, delimiter); 
       getline(fin, manager_id, '\n');
 
     currentRecord.id = stoll(id,size_ptr,0);
     currentRecord.name = name;
     currentRecord.bio = bio;
+    //cout << currentRecord.bio.capacity() << "\n"; // REMOVE
     currentRecord.manager_id = stoll(manager_id,size_ptr,0);
     currentBlock.records[i] = currentRecord;
+    currentBlock.totalSize += sizeof(currentRecord);
+    currentBlock.numRecords += 1;
+    if (currentBlock.numRecords >= 5){
+      // write currentBlock and save the location
+      writeBlock(currentBlock,currentOffset); 
+      currentOffset = writeBlock(currentBlock,currentOffset); 
+      i = 0;
+    }
     i++;
 
      //  cout << "ID: " << currentRecord.id << '\n';
@@ -156,25 +177,29 @@ void read() {
 }
 
 // Read block
-struct block readBlock(){
-  FILE *infile;
+struct block readBlock(struct block myBlock, int fileLocation){
+  //FILE *infile;
+  ifstream fin;
   struct block currentBlock;
   //struct block readBlock;
   
-  
-  infile = fopen ("EmployeeIndex.txt", "r"); 
+
+  fin.seekg(fileLocation);
+  fin.read((char*) &myBlock,sizeof(struct block));
+  //infile = fopen ("EmployeeIndex.txt", "r"); 
+  /* fin.open("EmployeeIndex.txt");
   if (infile == NULL) 
   { 
     fprintf(stderr, "\nError opening file\n"); 
     exit (1); 
-  } 
+  }  */
   
   // read file contents till end of file 
-  while(fread(&currentBlock, sizeof(struct block), 1, infile)) 
-    
+  /* while(fread(&currentBlock, sizeof(struct block), 1, infile)) 
+     */
 
 // close file 
-fclose (infile); 
+/* fclose (infile);  */
 return currentBlock;
 }
 
